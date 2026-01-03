@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useToast } from "@/contexts/ToastContext";
-
-type Task = {
-  id: number;
-  title: string;
-  description: string;
-  completed: boolean;
-};
+import { api, Task } from "@/lib/api";
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -25,65 +19,65 @@ export default function Home() {
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
+  // ======================
+  // LOAD
+  // ======================
   async function loadTasks() {
-    setLoading(true);
     try {
-      const res = await fetch("http://localhost:8080/api/tasks");
-      const data = await res.json();
+      const data = await api.getTasks();
       setTasks(data);
+    } catch {
+      showToast("Erro ao carregar tasks", "error");
     } finally {
       setLoading(false);
     }
   }
 
-  // CREATE (sem reload)
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  // ======================
+  // CREATE
+  // ======================
   async function handleCreateTask(e: React.FormEvent) {
     e.preventDefault();
     setErrors({});
 
-    const res = await fetch("http://localhost:8080/api/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description }),
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      if (data?.errors) {
-        setErrors(data.errors);
+    try {
+      const newTask = await api.createTask({ title, description });
+      setTasks((prev) => [...prev, newTask]);
+      setTitle("");
+      setDescription("");
+      showToast("Task criada com sucesso");
+    } catch (err: any) {
+      if (err?.errors) {
+        setErrors(err.errors);
         return;
       }
       showToast("Erro ao criar task", "error");
-      return;
     }
-
-    const newTask = await res.json();
-
-    setTasks((prev) => [...prev, newTask]);
-    setTitle("");
-    setDescription("");
-    showToast("Task criada com sucesso");
   }
 
-  // DELETE (otimista)
+  // ======================
+  // DELETE
+  // ======================
   async function handleDeleteTask(id: number) {
     const previous = tasks;
     setTasks((prev) => prev.filter((task) => task.id !== id));
 
-    const res = await fetch(`http://localhost:8080/api/tasks/${id}`, {
-      method: "DELETE",
-    });
-
-    if (!res.ok) {
+    try {
+      await api.deleteTask(id);
+      showToast("Task deletada");
+    } catch {
       setTasks(previous);
       showToast("Erro ao deletar task", "error");
-      return;
     }
-
-    showToast("Task deletada");
   }
 
-  // UPDATE (otimista)
+  // ======================
+  // UPDATE
+  // ======================
   async function handleUpdateTask(id: number) {
     const previous = tasks;
 
@@ -95,26 +89,22 @@ export default function Home() {
       )
     );
 
-    const res = await fetch(`http://localhost:8080/api/tasks/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      await api.updateTask(id, {
         title: editTitle,
         description: editDescription,
-      }),
-    });
-
-    if (!res.ok) {
+      });
+      setEditingId(null);
+      showToast("Task atualizada");
+    } catch {
       setTasks(previous);
       showToast("Erro ao atualizar task", "error");
-      return;
     }
-
-    setEditingId(null);
-    showToast("Task atualizada");
   }
 
-  // TOGGLE COMPLETED (otimista)
+  // ======================
+  // TOGGLE
+  // ======================
   async function handleToggleCompleted(id: number) {
     const previous = tasks;
 
@@ -124,22 +114,14 @@ export default function Home() {
       )
     );
 
-    const res = await fetch(`http://localhost:8080/api/tasks/${id}/toggle`, {
-      method: "PATCH",
-    });
-
-    if (!res.ok) {
+    try {
+      await api.toggleTask(id);
+      showToast("Status atualizado");
+    } catch {
       setTasks(previous);
       showToast("Erro ao atualizar status", "error");
-      return;
     }
-
-    showToast("Status atualizado");
   }
-
-  useEffect(() => {
-    loadTasks();
-  }, []);
 
   if (loading) return <p className="p-6">Carregando...</p>;
 
@@ -210,12 +192,14 @@ export default function Home() {
 
                 <div className="flex gap-2">
                   <button
+                    type="button"
                     onClick={() => handleUpdateTask(task.id)}
                     className="text-green-600"
                   >
                     Salvar
                   </button>
                   <button
+                    type="button"
                     onClick={() => setEditingId(null)}
                     className="text-gray-500"
                   >
@@ -251,6 +235,7 @@ export default function Home() {
 
                 <div className="flex flex-col gap-2">
                   <button
+                    type="button"
                     onClick={() => {
                       setEditingId(task.id);
                       setEditTitle(task.title);
@@ -262,6 +247,7 @@ export default function Home() {
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => handleDeleteTask(task.id)}
                     className="text-red-600"
                   >
