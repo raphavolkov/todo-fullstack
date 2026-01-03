@@ -12,15 +12,43 @@ type Task = {
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  async function loadTasks() {
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:8080/api/tasks");
+      const data = await res.json();
+      setTasks(data);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleCreateTask(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!title.trim()) return;
+
+    await fetch("http://localhost:8080/api/tasks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        description,
+      }),
+    });
+
+    setTitle("");
+    setDescription("");
+    loadTasks(); // 🔑 atualiza lista
+  }
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/tasks")
-      .then((res) => res.json())
-      .then((data) => {
-        setTasks(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    loadTasks();
   }, []);
 
   if (loading) {
@@ -28,9 +56,33 @@ export default function Home() {
   }
 
   return (
-    <main className="p-6">
+    <main className="p-6 max-w-xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Minhas Tasks</h1>
 
+      {/* FORM */}
+      <form onSubmit={handleCreateTask} className="mb-6 space-y-2">
+        <input
+          type="text"
+          placeholder="Título da task"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full border rounded p-2"
+        />
+
+        <input
+          type="text"
+          placeholder="Descrição (opcional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full border rounded p-2"
+        />
+
+        <button type="submit" className="bg-black text-white px-4 py-2 rounded">
+          Criar task
+        </button>
+      </form>
+
+      {/* LISTA */}
       {tasks.length === 0 && (
         <p className="text-gray-500">Nenhuma task encontrada.</p>
       )}
