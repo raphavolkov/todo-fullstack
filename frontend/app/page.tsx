@@ -9,8 +9,6 @@ type Task = {
   completed: boolean;
 };
 
-type ValidationErrors = Record<string, string>;
-
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +16,7 @@ export default function Home() {
   // CREATE
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // EDIT
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -48,13 +46,10 @@ export default function Home() {
     });
 
     if (!res.ok) {
-      if (res.status === 400) {
-        const data = await res.json();
-        setErrors(data.errors ?? {});
-        return;
+      const data = await res.json();
+      if (data?.errors) {
+        setErrors(data.errors);
       }
-
-      alert("Erro inesperado");
       return;
     }
 
@@ -105,13 +100,18 @@ export default function Home() {
       <h1 className="text-2xl font-bold mb-4">Minhas Tasks</h1>
 
       {/* CREATE */}
-      <form onSubmit={handleCreateTask} className="mb-6 space-y-2">
+      <form onSubmit={handleCreateTask} className="mb-6 space-y-3">
         <div>
           <input
             placeholder="Título"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full border p-2 rounded"
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setErrors((prev) => ({ ...prev, title: "" }));
+            }}
+            className={`w-full border p-2 rounded ${
+              errors.title ? "border-red-500" : ""
+            }`}
           />
           {errors.title && (
             <p className="text-red-500 text-sm">{errors.title}</p>
@@ -122,8 +122,13 @@ export default function Home() {
           <input
             placeholder="Descrição"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full border p-2 rounded"
+            onChange={(e) => {
+              setDescription(e.target.value);
+              setErrors((prev) => ({ ...prev, description: "" }));
+            }}
+            className={`w-full border p-2 rounded ${
+              errors.description ? "border-red-500" : ""
+            }`}
           />
           {errors.description && (
             <p className="text-red-500 text-sm">{errors.description}</p>
