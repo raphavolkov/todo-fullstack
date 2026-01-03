@@ -4,6 +4,7 @@ import com.todo.backend.domain.Task;
 import com.todo.backend.dto.TaskRequestDTO;
 import com.todo.backend.dto.TaskResponseDTO;
 import com.todo.backend.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,9 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponseDTO> create(@RequestBody TaskRequestDTO dto) {
+    public ResponseEntity<TaskResponseDTO> create(
+        @Valid @RequestBody TaskRequestDTO dto
+    ) {
         Task task = new Task(dto.getTitle(), dto.getDescription());
         Task created = taskService.create(task);
         return ResponseEntity.ok(new TaskResponseDTO(created));
@@ -47,7 +50,7 @@ public class TaskController {
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponseDTO> update(
             @PathVariable Long id,
-            @RequestBody TaskRequestDTO dto
+            @Valid @RequestBody TaskRequestDTO dto
     ) {
         Task updated = taskService.update(id, dto);
         return ResponseEntity.ok(new TaskResponseDTO(updated));
