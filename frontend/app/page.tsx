@@ -9,13 +9,18 @@ type Task = {
   completed: boolean;
 };
 
+type ValidationErrors = Record<string, string>;
+
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // CREATE
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [errors, setErrors] = useState<ValidationErrors>({});
 
+  // EDIT
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
@@ -31,22 +36,34 @@ export default function Home() {
     }
   }
 
+  // CREATE
   async function handleCreateTask(e: React.FormEvent) {
     e.preventDefault();
+    setErrors({});
 
-    if (!title.trim()) return;
-
-    await fetch("http://localhost:8080/api/tasks", {
+    const res = await fetch("http://localhost:8080/api/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, description }),
     });
+
+    if (!res.ok) {
+      if (res.status === 400) {
+        const data = await res.json();
+        setErrors(data.errors ?? {});
+        return;
+      }
+
+      alert("Erro inesperado");
+      return;
+    }
 
     setTitle("");
     setDescription("");
     loadTasks();
   }
 
+  // DELETE
   async function handleDeleteTask(id: number) {
     await fetch(`http://localhost:8080/api/tasks/${id}`, {
       method: "DELETE",
@@ -54,6 +71,7 @@ export default function Home() {
     loadTasks();
   }
 
+  // UPDATE
   async function handleUpdateTask(id: number) {
     await fetch(`http://localhost:8080/api/tasks/${id}`, {
       method: "PUT",
@@ -68,12 +86,11 @@ export default function Home() {
     loadTasks();
   }
 
-  // 🔥 TOGGLE COMPLETED
+  // TOGGLE COMPLETED
   async function handleToggleCompleted(id: number) {
     await fetch(`http://localhost:8080/api/tasks/${id}/toggle`, {
       method: "PATCH",
     });
-
     loadTasks();
   }
 
@@ -89,18 +106,30 @@ export default function Home() {
 
       {/* CREATE */}
       <form onSubmit={handleCreateTask} className="mb-6 space-y-2">
-        <input
-          placeholder="Título"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-        <input
-          placeholder="Descrição"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
+        <div>
+          <input
+            placeholder="Título"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+          {errors.title && (
+            <p className="text-red-500 text-sm">{errors.title}</p>
+          )}
+        </div>
+
+        <div>
+          <input
+            placeholder="Descrição"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+          {errors.description && (
+            <p className="text-red-500 text-sm">{errors.description}</p>
+          )}
+        </div>
+
         <button className="bg-black text-white px-4 py-2 rounded">
           Criar task
         </button>
