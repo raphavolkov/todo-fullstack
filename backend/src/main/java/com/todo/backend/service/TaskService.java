@@ -1,6 +1,7 @@
 package com.todo.backend.service;
 
 import com.todo.backend.domain.Task;
+import com.todo.backend.dto.TaskRequestDTO;
 import com.todo.backend.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,14 @@ public class TaskService {
         return taskRepository.findById(id);
     }
 
-    public Task update(Task task) {
+    public Task update(Long id, TaskRequestDTO dto) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        task.setTitle(dto.getTitle());
+        task.setDescription(dto.getDescription());
+        task.setCompleted(dto.isCompleted());
+
         return taskRepository.save(task);
     }
 

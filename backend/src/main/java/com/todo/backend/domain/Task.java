@@ -69,4 +69,16 @@ public class Task {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+    public void setTitle(String title) {
+    this.title = title;
+    }
+
+    public void setDescription(String description) {
+    this.description = description;
+    }
+
+    public void setCompleted(boolean completed) {
+    this.completed = completed;
+    }
 }
