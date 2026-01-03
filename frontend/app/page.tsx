@@ -44,7 +44,16 @@ export default function Home() {
 
     setTitle("");
     setDescription("");
-    loadTasks(); // 🔑 atualiza lista
+    loadTasks();
+  }
+
+  // 🔥 DELETE
+  async function handleDeleteTask(id: number) {
+    await fetch(`http://localhost:8080/api/tasks/${id}`, {
+      method: "DELETE",
+    });
+
+    loadTasks();
   }
 
   useEffect(() => {
@@ -89,12 +98,24 @@ export default function Home() {
 
       <ul className="space-y-2">
         {tasks.map((task) => (
-          <li key={task.id} className="border rounded p-3 flex flex-col gap-1">
-            <strong>{task.title}</strong>
-            <span className="text-sm text-gray-600">{task.description}</span>
-            <span className="text-sm">
-              Status: {task.completed ? "Concluída" : "Pendente"}
-            </span>
+          <li
+            key={task.id}
+            className="border rounded p-3 flex items-center justify-between"
+          >
+            <div className="flex flex-col gap-1">
+              <strong>{task.title}</strong>
+              <span className="text-sm text-gray-600">{task.description}</span>
+              <span className="text-sm">
+                Status: {task.completed ? "Concluída" : "Pendente"}
+              </span>
+            </div>
+
+            <button
+              onClick={() => handleDeleteTask(task.id)}
+              className="text-red-600 hover:text-red-800"
+            >
+              Deletar
+            </button>
           </li>
         ))}
       </ul>
