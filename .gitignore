@@ -1,0 +1,43 @@
+# =========================
+# Geral
+# =========================
+.DS_Store
+Thumbs.db
+.env
+.env.local
+.env.*.local
+
+# =========================
+# Java / Spring Boot
+# =========================
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/.idea/
+backend/*.iml
+backend/.classpath
+backend/.project
+backend/.settings/
+
+# Logs
+backend/*.log
+
+# =========================
+# Node / Next.js
+# =========================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+frontend/.env
+frontend/.env.local
+
+# =========================
+# IDEs
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS
+# =========================
+*.swp
