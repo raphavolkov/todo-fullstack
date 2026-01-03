@@ -43,4 +43,12 @@ public class TaskService {
     public void delete(Long id) {
         taskRepository.deleteById(id);
     }
+
+    public Task toggleCompleted(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task não encontrada"));
+
+        task.setCompleted(!task.isCompleted());
+        return taskRepository.save(task);
+    }
 }

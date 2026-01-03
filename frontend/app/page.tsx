@@ -68,6 +68,15 @@ export default function Home() {
     loadTasks();
   }
 
+  // 🔥 TOGGLE COMPLETED
+  async function handleToggleCompleted(id: number) {
+    await fetch(`http://localhost:8080/api/tasks/${id}/toggle`, {
+      method: "PATCH",
+    });
+
+    loadTasks();
+  }
+
   useEffect(() => {
     loadTasks();
   }, []);
@@ -135,11 +144,25 @@ export default function Home() {
             ) : (
               <>
                 <div className="flex flex-col gap-1">
-                  <strong>{task.title}</strong>
+                  <strong
+                    className={`cursor-pointer ${
+                      task.completed ? "line-through text-green-600" : ""
+                    }`}
+                    onClick={() => handleToggleCompleted(task.id)}
+                  >
+                    {task.title}
+                  </strong>
+
                   <span className="text-sm text-gray-600">
                     {task.description}
                   </span>
-                  <span className="text-sm">
+
+                  <span
+                    className={`text-sm cursor-pointer ${
+                      task.completed ? "text-green-600" : ""
+                    }`}
+                    onClick={() => handleToggleCompleted(task.id)}
+                  >
                     Status: {task.completed ? "Concluída" : "Pendente"}
                   </span>
                 </div>

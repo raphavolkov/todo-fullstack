@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -56,5 +57,11 @@ public class TaskController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         taskService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/toggle")
+    public ResponseEntity<TaskResponseDTO> toggleCompleted(@PathVariable Long id) {
+        Task task = taskService.toggleCompleted(id);
+        return ResponseEntity.ok(new TaskResponseDTO(task));
     }
 }
