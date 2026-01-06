@@ -2,7 +2,10 @@ package com.todo.backend.service;
 
 import com.todo.backend.domain.Task;
 import com.todo.backend.dto.TaskRequestDTO;
+import com.todo.backend.exception.TaskNotFoundException;
 import com.todo.backend.repository.TaskRepository;
+
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +25,9 @@ public class TaskService {
     }
 
     public List<Task> findAll() {
-        return taskRepository.findAll();
+    return taskRepository.findAll(
+            Sort.by(Sort.Direction.DESC, "createdAt")
+        );
     }
 
     public Optional<Task> findById(Long id) {
@@ -41,14 +46,17 @@ public class TaskService {
     }
 
     public void delete(Long id) {
+        if (!taskRepository.existsById(id)) {
+           throw new TaskNotFoundException(id);
+        }
         taskRepository.deleteById(id);
     }
 
     public Task toggleCompleted(Long id) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task não encontrada"));
+                .orElseThrow(() -> new TaskNotFoundException(id));
 
-        task.setCompleted(!task.isCompleted());
-        return taskRepository.save(task);
+            task.toggleCompleted();
+            return taskRepository.save(task);
     }
 }

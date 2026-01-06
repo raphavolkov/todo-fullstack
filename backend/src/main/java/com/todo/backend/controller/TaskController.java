@@ -5,12 +5,12 @@ import com.todo.backend.dto.TaskRequestDTO;
 import com.todo.backend.dto.TaskResponseDTO;
 import com.todo.backend.service.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -27,7 +27,8 @@ public class TaskController {
     ) {
         Task task = new Task(dto.getTitle(), dto.getDescription());
         Task created = taskService.create(task);
-        return ResponseEntity.ok(new TaskResponseDTO(created));
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new TaskResponseDTO(created));
     }
 
     @GetMapping

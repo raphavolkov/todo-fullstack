@@ -14,7 +14,7 @@ public class Task {
     @Column(nullable = false)
     private String title;
 
-    @Column(length = 500)
+    @Column(length = 255)
     private String description;
 
     @Column(nullable = false)
@@ -80,5 +80,9 @@ public class Task {
 
     public void setCompleted(boolean completed) {
     this.completed = completed;
+    }
+
+    public void toggleCompleted() {
+        this.completed = !this.completed;
     }
 }

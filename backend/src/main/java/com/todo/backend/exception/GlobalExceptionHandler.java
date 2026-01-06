@@ -1,4 +1,4 @@
-package com.todo.backend.controller.exception;
+package com.todo.backend.exception;
 
 import com.todo.backend.dto.ErrorResponseDTO;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Spring boot 4
+    // Spring Boot 4
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponseDTO(400, errors));
     }
 
-    // Spring boot 3
+    // Spring Boot 3
     @ExceptionHandler(BindException.class)
     public ResponseEntity<ErrorResponseDTO> handleBindException(
             BindException ex
@@ -50,10 +50,9 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponseDTO(400, errors));
     }
 
-    // ✅ Erros de regra de negócio
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntime(
-            RuntimeException ex
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleTaskNotFound(
+            TaskNotFoundException ex
     ) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
