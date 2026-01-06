@@ -26,9 +26,7 @@ public class Task {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    protected Task() {
-        // JPA only
-    }
+    protected Task() {}
 
     public Task(String title, String description) {
         this.title = title;
@@ -71,15 +69,11 @@ public class Task {
     }
 
     public void setTitle(String title) {
-    this.title = title;
+        this.title = title;
     }
 
     public void setDescription(String description) {
-    this.description = description;
-    }
-
-    public void setCompleted(boolean completed) {
-    this.completed = completed;
+        this.description = description;
     }
 
     public void toggleCompleted() {

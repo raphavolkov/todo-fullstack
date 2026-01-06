@@ -52,6 +52,7 @@ service/      → Regras de negócio
 domain/       → Entidades JPA
 dto/          → Objetos de entrada e saída (Request/Response)
 repository/   → Acesso aos dados
+exceptions/   → Tratamento de exceptions
 ```
 
 ### Frontend

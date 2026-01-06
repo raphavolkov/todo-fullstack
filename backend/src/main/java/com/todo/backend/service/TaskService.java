@@ -25,7 +25,7 @@ public class TaskService {
     }
 
     public List<Task> findAll() {
-    return taskRepository.findAll(
+        return taskRepository.findAll(
             Sort.by(Sort.Direction.DESC, "createdAt")
         );
     }
@@ -36,27 +36,26 @@ public class TaskService {
 
     public Task update(Long id, TaskRequestDTO dto) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+            .orElseThrow(() -> new TaskNotFoundException(id));
 
         task.setTitle(dto.getTitle());
         task.setDescription(dto.getDescription());
-        task.setCompleted(dto.isCompleted());
 
         return taskRepository.save(task);
     }
 
     public void delete(Long id) {
         if (!taskRepository.existsById(id)) {
-           throw new TaskNotFoundException(id);
+            throw new TaskNotFoundException(id);
         }
         taskRepository.deleteById(id);
     }
 
     public Task toggleCompleted(Long id) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
+            .orElseThrow(() -> new TaskNotFoundException(id));
 
-            task.toggleCompleted();
-            return taskRepository.save(task);
+        task.toggleCompleted();
+        return taskRepository.save(task);
     }
 }

@@ -27,16 +27,18 @@ public class TaskController {
     ) {
         Task task = new Task(dto.getTitle(), dto.getDescription());
         Task created = taskService.create(task);
-        return ResponseEntity.status(HttpStatus.CREATED)
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
             .body(new TaskResponseDTO(created));
     }
 
     @GetMapping
     public ResponseEntity<List<TaskResponseDTO>> findAll() {
         List<TaskResponseDTO> tasks = taskService.findAll()
-                .stream()
-                .map(TaskResponseDTO::new)
-                .toList();
+            .stream()
+            .map(TaskResponseDTO::new)
+            .toList();
 
         return ResponseEntity.ok(tasks);
     }
@@ -44,14 +46,14 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponseDTO> findById(@PathVariable Long id) {
         return taskService.findById(id)
-                .map(task -> ResponseEntity.ok(new TaskResponseDTO(task)))
-                .orElse(ResponseEntity.notFound().build());
+            .map(task -> ResponseEntity.ok(new TaskResponseDTO(task)))
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponseDTO> update(
-            @PathVariable Long id,
-            @Valid @RequestBody TaskRequestDTO dto
+        @PathVariable Long id,
+        @Valid @RequestBody TaskRequestDTO dto
     ) {
         Task updated = taskService.update(id, dto);
         return ResponseEntity.ok(new TaskResponseDTO(updated));
@@ -64,7 +66,9 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/toggle")
-    public ResponseEntity<TaskResponseDTO> toggleCompleted(@PathVariable Long id) {
+    public ResponseEntity<TaskResponseDTO> toggleCompleted(
+        @PathVariable Long id
+    ) {
         Task task = taskService.toggleCompleted(id);
         return ResponseEntity.ok(new TaskResponseDTO(task));
     }
