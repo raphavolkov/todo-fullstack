@@ -12,6 +12,14 @@ public class TaskRequestDTO {
     @Size(max = 255, message = "Descrição deve ter no máximo 255 caracteres")
     private String description;
 
+    public TaskRequestDTO() {
+    }
+
+    public TaskRequestDTO(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
+
     public String getTitle() {
         return title;
     }

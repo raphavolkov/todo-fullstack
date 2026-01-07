@@ -39,7 +39,10 @@ public class TaskService {
             .orElseThrow(() -> new TaskNotFoundException(id));
 
         task.setTitle(dto.getTitle());
-        task.setDescription(dto.getDescription());
+
+        if (dto.getDescription() != null) {
+            task.setDescription(dto.getDescription());
+        }
 
         return taskRepository.save(task);
     }
