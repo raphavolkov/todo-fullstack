@@ -49,7 +49,10 @@ export function useTasks() {
     );
 
     try {
-      await api.updateTask(id, { title, description });
+      const updated = await api.updateTask(id, { title, description });
+
+      setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+
       showToast("Task atualizada");
     } catch {
       setTasks(previous);
@@ -65,7 +68,10 @@ export function useTasks() {
     );
 
     try {
-      await api.toggleTask(id);
+      const updated = await api.toggleTask(id);
+
+      setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+
       showToast("Status atualizado");
     } catch {
       setTasks(previous);
