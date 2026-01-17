@@ -4,10 +4,9 @@ import com.todo.backend.domain.Task;
 import com.todo.backend.dto.TaskRequestDTO;
 import com.todo.backend.exception.TaskNotFoundException;
 import com.todo.backend.repository.TaskRepository;
-import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +20,11 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
+    public Task findByIdOrThrow(Long id) {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+    }
+
     @Transactional
     public Task create(Task task) {
         return taskRepository.save(task);
@@ -32,14 +36,12 @@ public class TaskService {
     }
 
     public Task findById(Long id) {
-        return taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
+        return findByIdOrThrow(id);
     }
 
     @Transactional
     public Task update(Long id, TaskRequestDTO dto) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
+        Task task = findByIdOrThrow(id);
 
         task.setTitle(dto.getTitle());
 
@@ -52,17 +54,13 @@ public class TaskService {
 
     @Transactional
     public void delete(Long id) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
-
+        Task task = findByIdOrThrow(id);
         taskRepository.delete(task);
     }
 
     @Transactional
     public Task toggleCompleted(Long id) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
-
+        Task task = findByIdOrThrow(id);
         task.toggleCompleted();
         return task;
     }
