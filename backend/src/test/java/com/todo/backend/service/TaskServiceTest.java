@@ -60,15 +60,15 @@ class TaskServiceTest {
     void deveBuscarTaskPorId() {
         Task task = taskService.create(new Task("Buscar", null));
 
-        Task found = taskService.findById(task.getId()).orElseThrow();
+        Task found = taskService.findById(task.getId());
 
         assertThat(found.getId()).isEqualTo(task.getId());
         assertThat(found.getTitle()).isEqualTo("Buscar");
     }
 
     @Test
-    void deveRetornarVazioQuandoTaskNaoExiste() {
-        assertThat(taskService.findById(999L)).isEmpty();
+    void deveLancarExcecaoQuandoTaskNaoExiste() {
+        assertThatThrownBy(() -> taskService.findById(999L)).isInstanceOf(TaskNotFoundException.class);
     }
 
     @Test
@@ -98,9 +98,7 @@ class TaskServiceTest {
     void deveLancarExcecaoAoAtualizarTaskInexistente() {
         TaskRequestDTO dto = new TaskRequestDTO("Teste", null);
 
-        assertThatThrownBy(() ->
-                taskService.update(1L, dto)
-        ).isInstanceOf(TaskNotFoundException.class);
+        assertThatThrownBy(() -> taskService.update(1L, dto)).isInstanceOf(TaskNotFoundException.class);
     }
 
     @Test
@@ -114,9 +112,7 @@ class TaskServiceTest {
 
     @Test
     void deveLancarExcecaoAoDeletarTaskInexistente() {
-        assertThatThrownBy(() ->
-                taskService.delete(999L)
-        ).isInstanceOf(TaskNotFoundException.class);
+        assertThatThrownBy(() -> taskService.delete(999L)).isInstanceOf(TaskNotFoundException.class);
     }
 
     @Test
@@ -127,5 +123,5 @@ class TaskServiceTest {
         Task updated = taskService.update(task.getId(), dto);
 
         assertThat(updated.getDescription()).isEqualTo("Descricao");
-}
+    }
 }

@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -78,7 +77,7 @@ class TaskControllerTest {
         void deveBuscarTaskPorId() throws Exception {
                 Task task = new Task("Buscar", null);
 
-                when(taskService.findById(1L)).thenReturn(Optional.of(task));
+                when(taskService.findById(1L)).thenReturn(task);
 
                 mockMvc.perform(get("/api/tasks/1"))
                                 .andExpect(status().isOk())
@@ -87,7 +86,8 @@ class TaskControllerTest {
 
         @Test
         void deveRetornar404QuandoTaskNaoExiste() throws Exception {
-                when(taskService.findById(1L)).thenReturn(Optional.empty());
+                when(taskService.findById(1L))
+                                .thenThrow(new TaskNotFoundException(1L));
 
                 mockMvc.perform(get("/api/tasks/1"))
                                 .andExpect(status().isNotFound());
